@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Semantic Search - AI Research DB</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        header {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        header h1 { font-size: 2em; margin-bottom: 10px; }
+        nav {
+            background: #34495e;
+            padding: 15px 30px;
+            display: flex;
+            gap: 20px;
+        }
+        nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+        nav a:hover { background: #667eea; }
+        nav a.active { background: #667eea; }
+        .content {
+            padding: 40px;
+        }
+        .search-box {
+            background: #ecf0f1;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .search-box h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover { transform: translateY(-2px); }
+        .info-box {
+            background: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            color: #2c3e50;
+        }
+        .error-box {
+            background: #fde8e8;
+            border-left: 4px solid #e74c3c;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            color: #c0392b;
+        }
+        .results {
+            margin-top: 30px;
+        }
+        .results h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        .result-item {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+        .result-item .similarity {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-bottom: 10px;
+        }
+        .result-item .content {
+            color: #2c3e50;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+        .example-vectors {
+            background: #fff9e6;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            color: #2c3e50;
+        }
+        .example-vectors p {
+            margin-bottom: 8px;
+        }
+        code {
+            background: #ecf0f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔬 AI Research Assistant DB</h1>
+            <p>Week 07 - Vector Embeddings & Semantic Search Demo</p>
+        </header>
+        
+        <nav>
+            <a href="/">Home</a>
+            <a href="/search" class="active">Semantic Search</a>
+        </nav>
+        
+        <div class="content">
+            <div class="search-box">
+                <h2>🔍 Semantic Search (pgvector)</h2>
+                <p style="color: #7f8c8d; margin-bottom: 20px;">Enter a 3-dimensional vector to find similar embeddings in the database using pgvector's distance operator (<=>).</p>
+                
+                <form method="POST">
+                    <div class="form-group">
+                        <label for="query_vector">Query Vector (3 dimensions, space or comma-separated):</label>
+                        <input type="text" id="query_vector" name="query_vector" placeholder="0.15 0.85 0.15" value="{% if query_vector %}{{ query_vector|join(' ') }}{% endif %}">
+                    </div>
+                    <button type="submit">Search</button>
+                </form>
+                
+                <div class="example-vectors" style="margin-top: 20px;">
+                    <p><strong>Try these example vectors:</strong></p>
+                    <p><code>0.15 0.85 0.15</code> - Climate/temperature query</p>
+                    <p><code>0.7 0.1 0.8</code> - AI/alignment query</p>
+                    <p><code>0.9 0.2 0.4</code> - Architecture/efficiency query</p>
+                </div>
+            </div>
+            
+            {% if error %}
+            <div class="error-box">
+                ⚠️ <strong>Error:</strong> {{ error }}
+            </div>
+            {% endif %}
+            
+            {% if results %}
+            <div class="results">
+                <h3>📊 Search Results ({{ results|length }} matches)</h3>
+                {% if results %}
+                    {% for result in results %}
+                    <div class="result-item">
+                        <div class="similarity">
+                            Similarity: {{ "%.2f"|format(result[3]) }}
+                        </div>
+                        <div class="content">
+                            <strong>Doc ID:</strong> {{ result[1] }}<br>
+                            <strong>Content:</strong> {{ result[2] }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No results found for the given query vector.</p>
+                {% endif %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
