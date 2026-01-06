@@ -56,6 +56,8 @@ Then open your browser to `http://localhost:5000`
 
 The `.env` file stores database credentials (do not commit to version control):
 
+The following is a default sample
+
 ```
 DB_HOST=localhost
 DB_PORT=5432
