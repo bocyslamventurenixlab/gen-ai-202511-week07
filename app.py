@@ -76,7 +76,7 @@ def search():
                     # Perform semantic search using pgvector operator (<=>)
                     # Cast the query vector to vector type for pgvector compatibility
                     query = """
-                        SELECT id, doc_id, content, 1 - (embedding <=> %s::vector) AS similarity
+                        SELECT id, doc_id, content, embedding, 1 - (embedding <=> %s::vector) AS similarity
                         FROM embeddings
                         ORDER BY similarity DESC
                         LIMIT 10;

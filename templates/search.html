@@ -198,11 +198,12 @@
                     {% for result in results %}
                     <div class="result-item">
                         <div class="similarity">
-                            Similarity: {{ "%.2f"|format(result[3]) }}
+                            Similarity: {{ "%.2f"|format(result[4]) }}
                         </div>
                         <div class="content">
                             <strong>Doc ID:</strong> {{ result[1] }}<br>
-                            <strong>Content:</strong> {{ result[2] }}
+                            <strong>Content:</strong> {{ result[2] }}<br>
+                            <strong>Vector:</strong> {{ result[3] }}
                         </div>
                     </div>
                     {% endfor %}
